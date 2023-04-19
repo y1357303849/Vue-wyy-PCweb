@@ -118,12 +118,14 @@
       <div class="musicLists">
         <ul class="musicListsUl">
           <li
-            @click="goSongListPage(index)"
+            @click="goSongListPage(item)"
             class="musicListsLi"
             v-for="(item, index) in songLists"
             :key="index"
           >
-            <img class="listImgs" :src="item.coverImgUrl" alt="" />
+            <div class="mlImg">
+              <img class="listImgs" :src="item.coverImgUrl" alt="" />
+            </div>
             <p class="listText">{{ item.name }}</p>
           </li>
         </ul>
@@ -237,14 +239,13 @@ export default {
       }
     },
     // 点击歌单跳转详情页
-    goSongListPage(index) {
-      // 点击跳转到songListPage页面
-      this.$router.push("/songListPage");
-      // 将当前点击的li的对应的下标数据赋值
-      this.songListIndex = index;
-      // console.log(this.onlyIndex);
-      // 将当前点击的li的对应的下标数据传送给子页面
-      bus.$emit("songListData", this.songLists[this.songListIndex]);
+    goSongListPage(i) {
+      setTimeout(() => {
+        this.$router.push({
+          path: "/playListDetail",
+          query: { musicData: i },
+        });
+      }, 500);
     },
   },
 };
@@ -252,11 +253,10 @@ export default {
 
 <style lang="less" scoped>
 .songListBox {
-  width: 1200px;
+  width: 100%;
   margin-top: 75px;
-  margin-left: 200px;
   position: relative;
-  // margin-bottom: 100px;
+
   .songListContent {
     width: 100%;
     height: 2800px;
@@ -265,7 +265,7 @@ export default {
     .dropDownList {
       width: 80px;
       height: 40px;
-      margin: 10px 65px 0 65px;
+
       border-radius: 10px;
       border: 2px solid #f2cac9;
       background-color: #4b2e2b;
@@ -290,6 +290,7 @@ export default {
         background-color: #4b2e2b;
         overflow-y: scroll;
         overflow-x: hidden;
+        border-radius: 10px;
         .topTitle {
           width: 100%;
           height: 30px;
@@ -317,7 +318,6 @@ export default {
         .ClassifyBox {
           width: 90%;
           // height: 40px;
-          background-color: greenyellow;
           margin-top: 20px;
           margin-left: 25px;
           // 图标名字盒子
@@ -348,6 +348,7 @@ export default {
             background-color: #964d22;
             // height: 100px;
             margin-bottom: 15px;
+            border-radius: 10px;
             float: left;
             .boxListli {
               width: 55px;
@@ -357,6 +358,7 @@ export default {
               overflow: hidden;
               float: left;
               color: #f2cac9;
+              cursor: pointer;
             }
             .boxListli:hover {
               color: #4b2e2b;
@@ -384,10 +386,10 @@ export default {
     }
     // 热门标签
     .hotTap {
-      width: 1200px;
+      width: 100%;
       height: 40px;
-      margin: 20px 65px 0 65px;
-      // padding-top: 5px;
+      margin-top: 30px;
+      border-bottom: 3px solid #f2cac9;
       .tapName {
         width: 70px;
         height: 30px;
@@ -400,6 +402,7 @@ export default {
         height: 30px;
         line-height: 30px;
         float: left;
+        cursor: pointer;
         .hotTapName {
           margin-left: 50px;
           float: left;
@@ -412,33 +415,44 @@ export default {
     }
     // 歌单列表
     .musicLists {
-      width: 1200px;
-      margin: 20px 65px 0 55px;
-      // padding-top: 20px;
-      // margin-bottom: 50px;
+      width: 100%;
+      margin-top: 20px;
       .musicListsUl {
         width: 100%;
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
         .musicListsLi {
           width: 200px;
           height: 250px;
-          float: left;
-          box-sizing: border-box;
           margin-left: 10px;
-          margin-top: 10px;
+          margin-bottom: 10px;
+          cursor: pointer;
           p {
             color: #f2cac9;
           }
-          .listImgs {
+          .mlImg {
             width: 200px;
             height: 200px;
-            border-radius: 15px;
-            box-sizing: border-box;
-            padding-bottom: 5px;
+            border-radius: 20px;
+            overflow: hidden;
+            .listImgs {
+              width: 100%;
+              height: 100%;
+              transition: 0.5s;
+            }
           }
           .listText {
             width: 100%;
-            height: 50px;
+            height: 45px;
+            margin-top: 5px;
+            line-height: 22px;
             font-size: 17px;
+          }
+        }
+        .musicListsLi:hover {
+          .listImgs {
+            transform: scale(1.1);
           }
         }
       }

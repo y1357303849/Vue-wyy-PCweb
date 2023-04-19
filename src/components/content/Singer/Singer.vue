@@ -39,9 +39,10 @@
     <div class="singerHead">
       <ul>
         <li
+          class="shLi"
           v-for="(item, index) in singerList"
           :key="index"
-          @click="goSingerPage(index)"
+          @click="goSingerPage(item.id)"
         >
           <div class="singerPic">
             <img :src="item.picUrl" alt="" />
@@ -97,8 +98,6 @@ export default {
       ],
       // 歌手头像列表
       singerList: [],
-      // 点击歌手对应的下标
-      singerIndex: 0,
     };
   },
   created() {
@@ -112,29 +111,28 @@ export default {
       this.singerList = res.artists;
     },
     // 点击跳转歌手详情页
-    goSingerPage(index) {
-      // 点击跳转到singerPage页面
-      this.$router.push("/singerPage");
-      // 将当前点击的li的对应的下标数据赋值
-      this.singerIndex = index;
-      // console.log(this.singerIndex);
-      // 将当前点击的li的对应的下标数据传送给子页面
-      bus.$emit("singerData", this.singerList[this.singerIndex]);
+    goSingerPage(i) {
+      setTimeout(() => {
+        this.$router.push({
+          path: "/singerPage",
+          query: { singerData: i },
+        });
+      }, 500);
     },
   },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .singerBox {
-  width: 1200px;
+  width: 100%;
   margin-top: 75px;
-  margin-left: 200px;
+
   // 头部导航
   .classify {
     width: 100%;
     height: 100px;
-    margin-left: 100px;
+    border-bottom: 3px solid #f2cac9;
     // 语种
     .language {
       width: 100%;
@@ -146,6 +144,8 @@ export default {
         float: left;
       }
       .languageName2 li {
+        border-radius: 10px;
+
         width: 100px;
         text-align: center;
         color: #f2cac9;
@@ -163,6 +163,8 @@ export default {
         float: left;
       }
       .classesName2 li {
+        border-radius: 10px;
+
         width: 100px;
         text-align: center;
         color: #f2cac9;
@@ -180,6 +182,8 @@ export default {
         float: left;
       }
       .screenName2 li {
+        border-radius: 10px;
+
         width: 40px;
         text-align: center;
         color: #f2cac9;
@@ -188,32 +192,52 @@ export default {
     }
     li:hover {
       background-color: #964d22;
+      font-weight: bold;
     }
   }
   // 歌手头像
   .singerHead {
     width: 100%;
-    height: 1200px;
+
     margin-top: 20px;
-    margin-left: 90px;
-    // background-color: red;
-    li {
-      width: 190px;
-      height: 170px;
-      float: left;
-      padding-left: 10px;
-      padding-top: 10px;
-      .singerPic img {
-        width: 100%;
-        height: 150px;
-        border-radius: 20px;
+    ul {
+      width: 100%;
+      height: 100%;
+      display: flex;
+
+      flex-wrap: wrap;
+      .shLi {
+        width: 190px;
+        height: 180px;
+        margin-left: 10px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        .singerPic {
+          width: 100%;
+          height: 150px;
+          border-radius: 20px;
+          overflow: hidden;
+          img {
+            width: 100%;
+            height: 100%;
+            transition: 0.5s;
+          }
+        }
+        .singerName {
+          width: 100%;
+          height: 25px;
+          margin-top: 5px;
+          color: #f2cac9;
+          line-height: 25px;
+          text-align: center;
+          font-weight: bold;
+          font-size: 20px;
+        }
       }
-      .singerName {
-        width: 100%;
-        height: 20px;
-        color: #f2cac9;
-        line-height: 20px;
-        text-align: center;
+      .shLi:hover {
+        img {
+          transform: scale(1.3);
+        }
       }
     }
   }

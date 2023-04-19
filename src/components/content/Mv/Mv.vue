@@ -2,7 +2,7 @@
   <div class="mvBox">
     <!-- 最新MV导航 -->
     <div class="newMvTab">
-      <div>最新MV</div>
+      <div class="nmT">最新MV</div>
       <ul>
         <li>内地</li>
         <li>港台</li>
@@ -17,9 +17,11 @@
         <li
           v-for="(item, index) in newMvList"
           :key="index"
-          @click="goNewMv(index)"
+          @click="goMvPage(item)"
         >
-          <img class="mvPic" :src="item.cover" alt="" />
+          <div class="nml1">
+            <img class="mvPic" :src="item.cover" alt="" />
+          </div>
           <p class="mvName">{{ item.name }}</p>
           <p class="mvSinger">{{ item.artistName }}</p>
         </li>
@@ -31,11 +33,14 @@
       <div class="recommendContent">
         <ul>
           <li
+            class="recLi"
             v-for="(item, index) in recommendMvList"
             :key="index"
-            @click="goRecommendMv(index)"
+            @click="goMvPage(item)"
           >
-            <img :src="item.picUrl" alt="" />
+            <div class="rec1">
+              <img :src="item.picUrl" alt="" />
+            </div>
             <p>
               {{ item.name + "--" + item.artistName }}
             </p>
@@ -45,7 +50,7 @@
     </div>
     <!-- MV排行榜导航 -->
     <div class="mvTopTab">
-      <div>MV排行榜</div>
+      <div class="nmT">MV排行榜</div>
       <ul>
         <li>内地</li>
         <li>港台</li>
@@ -59,12 +64,13 @@
       <div class="mvTopList">
         <ul>
           <li
+            class="mtlLi"
             v-for="(item, index) in mvTopList"
             :key="index"
-            @click="goMvTop(index)"
+            @click="goMvPage(item)"
           >
             <div class="mvTopBox">
-              <span class="mvTopNum">{{ index }}</span>
+              <span class="mvTopNum">{{ index + 1 }}</span>
               <div class="mvTopPic">
                 <img :src="item.cover" alt="" />
               </div>
@@ -81,10 +87,8 @@
 </template>
 
 <script>
-// eventBus
-import bus from "@/components/content/eventBus.js";
-
 import { getNewMvAPI, getRecommendMvAPI, getMvTopAPI } from "@/network/Mv.js";
+
 export default {
   name: "Mv",
   data() {
@@ -95,12 +99,6 @@ export default {
       recommendMvList: [],
       // MV排行榜
       mvTopList: [],
-      // 点击最新MV对应的下标
-      newMvIndex: 0,
-      // 点击推荐MV对应的下标
-      recommendMvIndex: 0,
-      // 点击MV排行榜对应的下标
-      mvTopIndex: 0,
     };
   },
   created() {
@@ -128,66 +126,49 @@ export default {
       this.mvTopList = res.data.slice(0, 10);
     },
     // 跳转最新MV详情页
-    goNewMv(index) {
-      // 点击跳转到newMvPage页面
-      this.$router.push("/newMvPage");
-      // 将当前点击的li的对应的下标数据赋值
-      this.newMvIndex = index;
-      // console.log(this.newMvIndex);
-      // 将当前点击的li的对应的下标数据传送给子页面
-      bus.$emit("newMvData", this.newMvList[this.newMvIndex]);
-    },
-    // 跳转推荐MV详情页
-    goRecommendMv(index) {
-      // 点击跳转到recommendMv页面
-      this.$router.push("/recommendMv");
-      // 将当前点击的li的对应的下标数据赋值
-      this.recommendMvIndex = index;
-      // console.log(this.newMvIndex);
-      // 将当前点击的li的对应的下标数据传送给子页面
-      bus.$emit("recommendMvData", this.recommendMvList[this.recommendMvIndex]);
-    },
-    // 跳转MV排行榜详情页
-    goMvTop(index) {
-      // 点击跳转到mvTopPage页面
-      this.$router.push("/mvTopPage");
-      // 将当前点击的li的对应的下标数据赋值
-      this.mvTopIndex = index;
-      // console.log(this.newMvIndex);
-      // 将当前点击的li的对应的下标数据传送给子页面
-      bus.$emit("mvTopData", this.mvTopList[this.mvTopIndex]);
+    goMvPage(i) {
+      setTimeout(() => {
+        this.$router.push({
+          path: "/MvPage",
+          query: { onlyData: i },
+        });
+      }, 500);
     },
   },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .mvBox {
-  width: 1200px;
+  width: 100%;
   margin-top: 75px;
-  margin-left: 200px;
   // 最新MV导航
   .newMvTab {
     width: 100%;
     height: 30px;
-    margin-left: 100px;
-    div {
+    border-bottom: 3px solid #f2cac9;
+    .nmT {
       width: 100px;
       height: 30px;
       font-weight: 900;
       line-height: 30px;
-      font-size: 26px;
+      font-size: 25px;
       color: #f2cac9;
       float: left;
     }
-    li {
-      width: 50px;
+    ul {
+      width: calc(100% - 110px);
       height: 30px;
-      line-height: 30px;
-      font-size: 20px;
-      text-align: center;
-      color: #f2cac9;
-      float: left;
+      margin-left: 10px;
+      li {
+        width: 50px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 20px;
+        text-align: center;
+        color: #f2cac9;
+        float: left;
+      }
     }
     li:hover {
       color: #964d22;
@@ -196,70 +177,112 @@ export default {
   // 最新MV
   .newMV {
     width: 100%;
-    height: 800px;
-    margin-top: 10px;
-    margin-left: 80px;
-    li {
-      width: 280px;
-      height: 250px;
-      padding-left: 20px;
-      padding-top: 10px;
-      float: left;
-      .mvPic {
-        width: 100%;
-        height: 200px;
-        border-radius: 20px;
+    margin-top: 20px;
+    ul {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      li {
+        width: 330px;
+        height: 270px;
+        margin-left: 10px;
+        margin-bottom: 10px;
+        .nml1 {
+          width: 100%;
+          height: 200px;
+          border-radius: 20px;
+          overflow: hidden;
+          .mvPic {
+            width: 100%;
+            height: 100%;
+            transition: 0.5s;
+          }
+        }
+        .mvName {
+          width: 100%;
+          height: 30px;
+          line-height: 30px;
+          font-weight: 900;
+          font-size: 20px;
+          color: #f2cac9;
+          text-align: center;
+          margin-top: 5px;
+        }
+        .mvSinger {
+          width: 100%;
+          height: 20px;
+          line-height: 20px;
+          font-size: 15px;
+          color: #f2cac9;
+          text-align: center;
+          margin-top: 5px;
+        }
       }
-      .mvName {
-        font-weight: 900;
-        font-size: 20px;
-        color: #f2cac9;
-        text-align: center;
-      }
-      .mvSinger {
-        font-size: 15px;
-        color: #f2cac9;
-        text-align: center;
+      li:hover {
+        .mvPic {
+          transform: scale(1.1);
+        }
       }
     }
   }
   // 推荐MV
   .recommendMv {
     width: 100%;
-    margin-top: 20px;
-    margin-left: 100px;
+    margin-top: 50px;
     .recommendTitle {
       width: 100%;
       height: 30px;
       line-height: 30px;
-      font-size: 26px;
+      font-size: 25px;
       color: #f2cac9;
       font-weight: 900;
+      border-bottom: 3px solid #f2cac9;
     }
     .recommendContent {
-      padding-top: 10px;
       width: 100%;
       height: 260px;
-      box-sizing: border-box;
-      li {
-        width: 280px;
-        height: 240px;
-        float: left;
-        padding-left: 20px;
-        img {
-          width: 100%;
-          height: 200px;
-          border-radius: 20px;
+      margin-top: 20px;
+      ul {
+        width: 100%;
+        height: 100%;
+        display: flex;
+
+        flex-wrap: wrap;
+        .recLi {
+          width: 280px;
+          height: 240px;
+          margin-left: 20px;
+          .rec1 {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 20px;
+            img {
+              width: 100%;
+              height: 100%;
+              transition: 0.5s;
+            }
+          }
+          p {
+            width: 100%;
+            height: 35px;
+            line-height: 35px;
+            margin-top: 5px;
+            font-size: 20px;
+            color: #f2cac9;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
         }
-        p {
-          height: 40px;
-          // line-height: 30px;
-          color: #f2cac9;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
+        .recLi:hover {
+          img {
+            transform: scale(1.1);
+          }
         }
       }
     }
@@ -271,25 +294,31 @@ export default {
   .mvTopTab {
     width: 100%;
     height: 30px;
-    margin-left: 100px;
     margin-top: 20px;
-    div {
-      width: 150px;
+    border-bottom: 3px solid #f2cac9;
+    .nmT {
+      width: 130px;
       height: 30px;
       font-weight: 900;
       line-height: 30px;
-      font-size: 26px;
+      font-size: 25px;
       color: #f2cac9;
       float: left;
     }
-    li {
-      width: 50px;
+    ul {
+      width: calc(100% - 140px);
       height: 30px;
-      line-height: 30px;
-      font-size: 20px;
-      text-align: center;
-      color: #f2cac9;
+      margin-left: 10px;
       float: left;
+      li {
+        width: 50px;
+        height: 30px;
+        line-height: 30px;
+        font-size: 20px;
+        text-align: center;
+        color: #f2cac9;
+        float: left;
+      }
     }
     li:hover {
       color: #964d22;
@@ -298,60 +327,74 @@ export default {
   // MV排行榜
   .mvTop {
     width: 100%;
-    height: 700px;
-    margin-left: 100px;
     margin-top: 20px;
-    // 列表每个li
-    li {
-      width: 50%;
-      height: 110px;
-      float: left;
-      margin-top: 10px;
-      box-sizing: border-box;
-      // 每个li的内部盒子，号码、图片、歌名
-      .mvTopBox {
-        // 号码
-        .mvTopNum {
-          width: 30px;
-          height: 100%;
-          justify-content: center;
-          padding-top: 35px;
-          box-sizing: border-box;
-          font-size: 25px;
-          color: #f2cac9;
-          float: left;
-        }
-        // 图片盒子
-        .mvTopPic {
-          position: relative;
-          img {
-            width: 150px;
-            height: 100px;
-            display: block;
-            // filter: blur(1px);
-            float: left;
-            border-radius: 15px;
-          }
-        }
-        // 音乐名字
-        .mvTopText {
-          width: 400px;
-          height: 110px;
-          float: left;
-          .mvTopMusic {
+    ul {
+      width: 100%;
+      height: 100%;
+      // 列表每个li
+      .mtlLi {
+        width: 50%;
+        height: 110px;
+        float: left;
+        margin-bottom: 10px;
+        border-radius: 20px;
+        // 每个li的内部盒子，号码、图片、歌名
+        .mvTopBox {
+          width: 95%;
+          margin: 0 auto;
+          // 号码
+          .mvTopNum {
+            width: 30px;
+            height: 100%;
+            line-height: 110px;
             font-size: 25px;
             color: #f2cac9;
-            margin-bottom: 45px;
-            margin-left: 20px;
-            box-sizing: border-box;
+            float: left;
           }
-          .mvTopSinger {
-            font-size: 20px;
-            color: #f2cac9;
-            margin-left: 20px;
-            box-sizing: border-box;
-            // overflow: hidden;
+          // 图片盒子
+          .mvTopPic {
+            width: 150px;
+            height: 110px;
+            float: left;
+            border-radius: 15px;
+            overflow: hidden;
+            img {
+              width: 100%;
+              height: 100%;
+              transition: 0.5s;
+              border-radius: 15px;
+            }
           }
+          // 音乐名字
+          .mvTopText {
+            width: calc(100% - 200px);
+            height: 110px;
+            float: left;
+            margin-left: 20px;
+            .mvTopMusic {
+              width: 100%;
+              height: calc(100% - 35px);
+              font-size: 25px;
+              color: #f2cac9;
+              display: -webkit-box;
+              overflow: hidden;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+            }
+            .mvTopSinger {
+              width: 100%;
+              height: 30px;
+              margin-top: 5px;
+              font-size: 20px;
+              color: #f2cac9;
+            }
+          }
+        }
+      }
+      .mtlLi:hover {
+        box-shadow: 1px 1px 10px 1px #f2cac9;
+        img {
+          transform: scale(1.1);
         }
       }
     }

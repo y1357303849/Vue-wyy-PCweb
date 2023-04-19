@@ -11,6 +11,7 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
     "qs": "^6.10.1",
+    "vant": "^2.12.54",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vue-video-player": "^5.0.2",
@@ -23,6 +24,21 @@
     "@vue/cli-service": "~4.5.0",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
-    "vue-template-compiler": "^2.6.11"
-  }
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.0.0",
+    "webpack-cli": "^4.0.0"
+  },
+  "description": "## Project setup ``` npm install ```",
+  "main": "babel.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/y1357303849/Vue-wyy-PCweb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/y1357303849/Vue-wyy-PCweb/issues"
+  },
+  "homepage": "https://github.com/y1357303849/Vue-wyy-PCweb#readme"
 }

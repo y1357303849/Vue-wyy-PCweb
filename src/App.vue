@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <div id="app">
     <Header></Header>
     <LeftBox></LeftBox>
     <Content></Content>
     <Bottom></Bottom>
+    <!-- 音乐播放 -->
+    <audio :src="$store.getters.getSong.songsUrl" autoplay></audio>
   </div>
 </template>
 
@@ -21,10 +23,20 @@ export default {
     Content,
     Bottom,
   },
+  created() {
+    // 绕过登陆获取数据
+    if (this.$store.state.cookie != null && this.$store.state.cookie != "") {
+      this.limit = 11;
+    }
+  },
 };
 </script>
 
 <style lang="less">
+#app {
+  // 禁止复制
+  user-select: none;
+}
 // 下拉菜单滚动条样式
 ::-webkit-scrollbar {
   /*滚动条整体样式*/

@@ -23,11 +23,12 @@
     <div class="newMusicList">
       <ul>
         <li
+          class="nmLi"
           v-for="(item, index) in newMusicList"
           :key="index"
-          @dblclick="playMusic(item.id, index)"
+          @dblclick="playMusic(item)"
         >
-          <div class="musicNum">{{ index }}</div>
+          <div class="musicNum">{{ index + 1 }}</div>
           <div class="musicPic">
             <img :src="item.picUrl" alt="" />
             <i class="iconfont icon-bofang"></i>
@@ -38,7 +39,7 @@
           <div class="musicTime">00:00</div>
         </li>
         <!-- 音乐播放 -->
-        <audio :src="musicUrlList" autoplay></audio>
+        <!-- <audio :src="musicUrlList" autoplay></audio> -->
       </ul>
     </div>
   </div>
@@ -58,72 +59,65 @@ export default {
       newMusicLeft: [],
       // 音乐播放
       musicUrlList: [],
-      // 点击歌曲的下标
-      newmIndex: 0,
     };
   },
   created() {
-    // 绕过登陆获取数据
-    if (this.$store.state.cookie != null && this.$store.state.cookie != "") {
-      this.limit = 11;
-    }
     this.NewMusicList();
-    this.playMusic();
+    // this.playMusic();
   },
   methods: {
     // 最新音乐
     async NewMusicList() {
       const { data: res } = await getNewMusicAPI(this.newMusicList);
-      console.log(res.result);
+      // console.log(res.result);
       this.newMusicList = res.result;
       // console.log(this.newMusicList.song.artists.name);
-      console.log(this.newMusicList[this.newmIndex]);
     },
     // 双击播放音乐
-    async playMusic(id, index) {
-      // console.log(id);
-      this.newmIndex = index;
-      // console.log(this.newmIndex);
+    async playMusic(i) {
       const { data: res } = await request.get(
         // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/song/url?id=" + id,
-        {
-          params: {
-            musicUrl: this.musicUrlList,
-          },
-        }
+        "/song/url?id=" + i.id
       );
       // console.log(res.data[0].url);
       this.musicUrlList = res.data[0].url;
-      // bus.$emit("onlyData", this.OnlyOnly[this.onlyIndex]);
-      // 将数据存储到localStorage里
-      // window.localStorage.setItem("smallDetail", JSON.stringify(this.musicUrlList));
-      // console.log(this.musicUrlList);
+      // console.log("双击", i);
+      // 存储歌名歌手专辑封面到vuex
+      this.$store.dispatch("asyncUpdateSongs", {
+        name: i.name,
+        user: i.song.artists[0].name,
+        album: i.picUrl,
+        songsUrl: this.musicUrlList,
+      });
+      // console.log(document.getElementsByTagName("a")[0].__vue__.$store);
     },
   },
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .newMvBox {
-  width: 1200px;
+  width: 100%;
   margin-top: 75px;
-  margin-left: 200px;
+
   // 顶部导航
   .topTab {
     width: 100%;
     height: 30px;
     line-height: 30px;
-    margin-left: 90px;
+    border-bottom: 3px solid #f2cac9;
     li {
       width: 50px;
       float: left;
       color: #f2cac9;
-      margin-left: 10px;
+      text-align: center;
     }
     li:hover {
       color: #964d22;
       border-bottom: 4px solid #964d22;
+    }
+    li:nth-child(n + 2) {
+      margin-left: 10px;
     }
   }
   // 列表顶部
@@ -133,7 +127,7 @@ export default {
     line-height: 40px;
     text-align: center;
     margin-top: 10px;
-    margin-left: 100px;
+    border-radius: 10px;
     display: flex;
     background-color: #964d22;
     div {
@@ -157,60 +151,75 @@ export default {
   // 歌曲列表
   .newMusicList {
     width: 100%;
-    margin-left: 100px;
-    li {
+    ul {
       width: 100%;
-      height: 60px;
-      line-height: 60px;
-      color: #f2cac9;
-      text-align: center;
+      height: 100%;
       display: flex;
-      // div {
-      //   border: 1px solid #964d22;
-      // }
-      .musicNum {
-        flex: 1;
+      justify-content: space-around;
+      flex-direction: column;
+      .nmLi {
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        color: #f2cac9;
+        text-align: center;
+        display: flex;
+        margin-top: 10px;
+        cursor: pointer;
+        border-radius: 10px;
+        .musicNum {
+          flex: 1;
+        }
+        .musicPic {
+          flex: 1;
+          position: relative;
+          border-radius: 10px;
+          overflow: hidden;
+          img {
+            width: 100%;
+            height: 100%;
+            transition: 0.5s;
+          }
+          .iconfont {
+            position: absolute;
+            top: 5px;
+            transform: translateY(-5px);
+            left: 15px;
+            font-size: 30px;
+            z-index: 99999;
+            color: #f2cac9;
+            font-weight: 700;
+          }
+        }
+        .musicName {
+          flex: 5;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+        .musicSinger {
+          flex: 5;
+        }
+        .musicAlbum {
+          flex: 5;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+        .musicTime {
+          flex: 4;
+        }
       }
-      .musicPic {
-        flex: 1;
-        position: relative;
+      .nmLi:hover {
+        box-shadow: 1px 1px 10px 1px #f2cac9;
         img {
-          width: 100%;
-          height: 100%;
-        }
-        .iconfont {
-          position: absolute;
-          top: 5px;
-          transform: translateY(-5px);
-          left: 15px;
-          font-size: 30px;
-          z-index: 99999;
-          color: #4b2e2b;
-          font-weight: 700;
+          transform: scale(1.1);
         }
       }
-      .musicName {
-        flex: 5;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-      .musicSinger {
-        flex: 5;
-      }
-      .musicAlbum {
-        flex: 5;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-      .musicTime {
-        flex: 4;
-      }
     }
-    li:nth-child(even) {
-      background-color: #964d22;
-    }
+    // .nmLi:nth-child(even) {
+    //   background-color: #964d22;
+    // }
   }
 }
 </style>

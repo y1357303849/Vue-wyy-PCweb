@@ -38,30 +38,30 @@
     <div class="singerTabBox">
       <ul>
         <li
-          class="albumLi"
-          @click="getAlbumli(1, index)"
-          :class="{ tabActive: showAlbumli === index }"
+          class="stbLi"
+          @click="getsTab(1)"
+          :class="{ tabActive: showTabs === 1 }"
         >
           专辑
         </li>
         <li
-          class="mvLi"
-          @click="getMvli(2, index)"
-          :class="{ tabActive: showMvli === index }"
+          class="stbLi"
+          @click="getsTab(2)"
+          :class="{ tabActive: showTabs === 2 }"
         >
           MV
         </li>
         <li
-          class="singerDataLi"
-          @click="getSingerDatali(3, index)"
-          :class="{ tabActive: showSingerDatali === index }"
+          class="stbLi"
+          @click="getsTab(3)"
+          :class="{ tabActive: showTabs === 3 }"
         >
           歌手详情
         </li>
         <li
-          class="similarLi"
-          @click="getSimilarli(4, index)"
-          :class="{ tabActive: showSimilarli === index }"
+          class="stbLi"
+          @click="getsTab(4)"
+          :class="{ tabActive: showTabs === 4 }"
         >
           相似歌手
         </li>
@@ -99,22 +99,17 @@
           <img :src="item.picUrl" alt="" />
         </div>
         <div class="hotContentBox">
-          <ul>
-            <li class="topTitle">{{ item.name }}</li>
-            <li
-              class="hotSingContent"
-              v-for="(item, index) in singerAlbums"
-              :key="index"
-            >
-              <div class="hotNum">{{ index }}</div>
-              <div @click="getLike(item)" class="likeIcon">
-                <i class="iconfont icon-like__easyico" v-if="item.likeShow"></i>
-                <i class="iconfont icon-shoucang" v-else></i>
-              </div>
-              <div class="singName">{{ item.name }}</div>
-              <div class="singTime">02:21</div>
-            </li>
-          </ul>
+          <div class="topTitle">{{ item.name }}</div>
+          <li
+            class="hotSingContent"
+            v-for="(item2, index) in singerAlbums"
+            :key="index"
+          >
+            <div class="hotNum">{{ index + 1 }}</div>
+
+            <div class="singName">{{ item2.name }}</div>
+            <div class="singTime">02:21</div>
+          </li>
         </div>
       </div>
     </div>
@@ -181,8 +176,6 @@
 </template>
 
 <script>
-// eventBus
-import bus from "@/components/content/eventBus.js";
 // 导入request模块
 import request from "@/untils/request.js";
 
@@ -192,12 +185,8 @@ export default {
     return {
       // 展示点击tab对应的内容
       showType: 1,
-      // 点击时添加的css样式
-      index: "",
-      showAlbumli: 0,
-      showMvli: 0,
-      showSingerDatali: 0,
-      showSimilarli: 0,
+      showTabs: 1,
+
       // 传过来的歌手ID
       singerId: "",
       // 头部信息数据
@@ -219,190 +208,93 @@ export default {
     };
   },
   created() {
-    // 销毁bus
-    bus.$off("singerData");
+    this.singerId = this.$route.query.singerData;
+    // console.log(this.singerId);
+
     this.singerTopDetail();
     this.singerHotDetail();
     this.singerAlbumDetail();
-    this.singerAlbumsDetail();
+
     this.singerMvDetail();
     this.singerSimilarDetail();
-    this.singerMoreDetail();
+    // this.singerMoreDetail();
   },
   mounted() {
-    // 接收父页面点击传送过来的数据id
-    bus.$on("singerData", (val) => {
-      this.singerId = val.id;
-      console.log(this.singerId);
-      // 将数据存储到localStorage里
-      window.localStorage.setItem("singerData", JSON.stringify(this.singerId));
-    });
+    // this.singerAlbumsDetail();
   },
   methods: {
     // 请求歌手头部详情数据
     async singerTopDetail() {
-      // 将存储的数据赋值到musicId里
-      const singerTop = window.localStorage;
-      console.log(singerTop);
       const { data: res } = await request.get(
-        // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/artist/detail?id=" + singerTop.singerData,
-        {
-          params: {
-            toplist: this.topDetail,
-          },
-        }
+        "/artist/detail?id=" + this.singerId
       );
       this.topDetail = res.data;
       // console.log(this.topDetail);
     },
     // 请求歌手热门50首详情数据
     async singerHotDetail() {
-      // 将存储的数据赋值到musicId里
-      const singerHot = window.localStorage;
-      // console.log(singerHot);
       const { data: res } = await request.get(
-        // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/artist/top/song?id=" + singerHot.singerData,
-        {
-          params: {
-            hotlist: this.hotDetail,
-          },
-        }
+        "/artist/top/song?id=" + this.singerId
       );
       this.hotDetail = res.songs;
-      // console.log(this.hotDetail);
     },
     // 请求歌手专辑详情数据
     async singerAlbumDetail() {
-      // 将存储的数据赋值到musicId里
-      const singerAlbum = window.localStorage;
-      // console.log(singerHot);
       const { data: res } = await request.get(
         // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/artist/album?id=" + singerAlbum.singerData + "&limit=30",
-        {
-          params: {
-            albumlist: this.albumDetail,
-          },
-        }
+        "/artist/album?id=" + this.singerId + "&limit=30"
       );
       this.albumDetail = res.hotAlbums;
+      // console.log(this.albumDetail);
       // 提取出各个专辑的ID，在请求专辑的详情数据
       this.albumDetail.forEach((item) => {
         // console.log(item.id);
         this.singerAlbumId.push(item.id);
       });
-      // console.log(this.singerAlbumId);
-      // console.log(this.albumDetail);
     },
     // 请求歌手各个专辑详情数据
-    async singerAlbumsDetail() {
-      // 将存储的数据赋值到musicId里
-      const albumId = this.singerAlbumId;
-      JSON.parse(JSON.stringify(albumId));
-      // const albumId = JSON.parse(JSON.stringify(this.singerAlbumId));
-      console.log(JSON.parse(JSON.stringify(albumId)));
-      const { data: res } = await request.get(
-        // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/album?id=" + albumId,
-        {
-          params: {
-            idlist: this.singerAlbums,
-          },
-        }
-      );
-      this.singerAlbums = res.songs;
-      console.log(this.singerAlbums.name);
-    },
+    // async singerAlbumsDetail() {
+    //   let albumId = this.singerAlbumId;
+
+    //   for (let i = 0; i <= albumId.length; i++) {
+
+    //     const { data: res } = await request.get("/album?id=" + albumId[i]);
+
+    //     this.singerAlbums.push(res.songs);
+
+    //   }
+    //   console.log(this.singerAlbums[3]);
+    // },
     // 请求歌手MV详情数据
     async singerMvDetail() {
-      // 将存储的数据赋值到musicId里
-      const singerMv = window.localStorage;
-      // console.log(singerMv);
-      const { data: res } = await request.get(
-        // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/artist/mv?id=" + singerMv.singerData,
-        {
-          params: {
-            mvlist: this.mvDetail,
-          },
-        }
-      );
+      const { data: res } = await request.get("/artist/mv?id=" + this.singerId);
       this.mvDetail = res.mvs;
       // console.log(this.mvDetail);
     },
     // 请求歌手介绍详情数据
     async singerSimilarDetail() {
-      // 将存储的数据赋值到musicId里
-      const singerSimilar = window.localStorage;
-      // console.log(singerSimilar);
       const { data: res } = await request.get(
-        // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/artist/desc?id=" + singerSimilar.singerData,
-        {
-          params: {
-            similarlist: this.similarDetail,
-          },
-        }
+        "/artist/desc?id=" + this.singerId
       );
       this.similarDetail = res;
       // console.log(this.similarDetail);
     },
     // 请求相似歌手详情数据
-    async singerMoreDetail() {
-      // 将存储的数据赋值到musicId里
-      const singerMore = window.localStorage;
-      // console.log(singerMore);
-      const { data: res } = await request.get(
-        // 网络请求尾部加上当前点击的组件对应的id，以此来获取对应歌手详情页的数据
-        "/simi/artist?id=" + singerMore.singerData,
-        {
-          params: {
-            morelist: this.singerMores,
-          },
-        }
-      );
-      this.singerMores = res.artists;
-      // console.log(this.singerMores);
-    },
+    // async singerMoreDetail() {
+    //   const { data: res } = await request.get(
+    //     "/simi/artist?id=" + this.singerId
+    //   );
+    //   this.singerMores = res.artists;
+    //   console.log(this.singerMores);
+    // },
     // 点击tab切换对应的内容，并改变css样式
-    getAlbumli(type, index) {
-      this.showAlbumli = index;
-      (this.showMvli = 0),
-        (this.showSingerDatali = 0),
-        (this.showSimilarli = 0);
-      this.showType = type;
-      if (this.showType === 1) {
-        this.style.display = true;
-      }
+
+    // 点击切换内容
+    getsTab(i) {
+      this.showType = i;
+      this.showTabs = i;
     },
-    getMvli(type, index) {
-      this.showMvli = index;
-      (this.showAlbumli = 0),
-        (this.showSingerDatali = 0),
-        (this.showSingerDatali = 0);
-      this.showType = type;
-      if (this.showType === 1) {
-        this.style.display = true;
-      }
-    },
-    getSingerDatali(type, index) {
-      this.showSingerDatali = index;
-      (this.showAlbumli = 0), (this.showMvli = 0), (this.showSimilarli = 0);
-      this.showType = type;
-      if (this.showType === 1) {
-        this.style.display = true;
-      }
-    },
-    getSimilarli(type, index) {
-      this.showSimilarli = index;
-      (this.showAlbumli = 0), (this.showMvli = 0), (this.showSingerDatali = 0);
-      this.showType = type;
-      if (this.showType === 1) {
-        this.style.display = true;
-      }
-    },
+
     // 点击喜爱按钮
     getLike(item) {
       if ((item.likeShow = !item.likeShow)) {
@@ -417,16 +309,16 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .singerBox {
-  width: 1200px;
+  width: 100%;
   margin-top: 75px;
-  margin-left: 200px;
+
   // 头部区域
   .singerTopBox {
     width: 100%;
     height: 250px;
-    margin-left: 50px;
+
     // 歌手头像
     .singerImgbox {
       width: 20%;
@@ -568,35 +460,30 @@ export default {
     width: 100%;
     height: 50px;
     margin-top: 20px;
-    margin-left: 50px;
-    .albumLi,
-    .mvLi,
-    .singerDataLi,
-    .similarLi {
+
+    .stbLi {
       width: 150px;
       height: 50px;
+      line-height: 50px;
       float: left;
       text-align: center;
-      padding-top: 15px;
-      box-sizing: border-box;
       color: #f2cac9;
     }
-    li:hover {
+    .stbLi:hover {
       color: #964d22;
-      font-weight: 900;
+
       border-bottom: 5px solid #964d22;
     }
     .tabActive {
       color: #964d22;
       border-bottom: 5px solid #964d22;
-      box-sizing: border-box;
     }
   }
   // 专辑内容区域
   .albumContentBox {
     width: 100%;
     margin-top: 20px;
-    margin-left: 50px;
+
     // 热门50首区域
     .hotDetailBox {
       width: 100%;
@@ -607,10 +494,11 @@ export default {
         width: 150px;
         height: 150px;
         float: left;
+        border-radius: 10px;
+        overflow: hidden;
         img {
           width: 100%;
           height: 100%;
-          border-radius: 10px;
         }
       }
       .hotContentBox {
@@ -660,6 +548,8 @@ export default {
         width: 150px;
         height: 150px;
         float: left;
+        border-radius: 10px;
+        overflow: hidden;
         img {
           width: 100%;
           height: 100%;
@@ -707,34 +597,47 @@ export default {
   // MV内容区域
   .mvContentBox {
     width: 100%;
-    height: 900px;
     margin-top: 20px;
-    margin-left: 50px;
-    .mvContentLi {
-      width: 200px;
-      height: 150px;
-      float: left;
-      margin-top: 10px;
-      .mvImgBox {
-        width: 150px;
-        height: 100px;
-        img {
-          padding-left: 25px;
+    ul {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      .mvContentLi {
+        width: 200px;
+        height: 150px;
+        margin-left: 20px;
+        margin-top: 10px;
+        .mvImgBox {
           width: 100%;
-          height: 100%;
+          height: 100px;
+          border-radius: 10px;
+          overflow: hidden;
+          img {
+            transition: 0.5s;
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .mvNameBox {
+          width: 100%;
+          height: 45px;
+          line-height: 22px;
+          color: #f2cac9;
+          margin-top: 5px;
+          font-weight: bold;
+          font-size: 15px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
         }
       }
-      .mvNameBox {
-        width: 150px;
-        height: 35px;
-        margin-left: 25px;
-        margin-top: 5px;
-        font-size: 15px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+      .mvContentLi:hover {
+        img {
+          transform: scale(1.1);
+        }
       }
     }
   }
@@ -743,18 +646,18 @@ export default {
     width: 100%;
     height: 1500px;
     margin-top: 20px;
-    margin-left: 50px;
+
     .headline {
       font-size: 20px;
       font-weight: 900;
-      color: #f2cac9;
+      color: #964d22;
       margin-top: 5px;
     }
     .contentText {
       text-indent: 34px;
       margin-top: 5px;
       font-size: 17px;
-      color: #964d22;
+      color: #f2cac9;
     }
   }
   // 相似歌手区域
@@ -762,7 +665,7 @@ export default {
     width: 100%;
     height: 1500px;
     margin-top: 20px;
-    margin-left: 20px;
+
     .moreList {
       width: 200px;
       height: 200px;

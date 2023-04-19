@@ -44,11 +44,11 @@
     <!-- 底部歌曲信息 -->
     <div class="bottomSongBox">
       <div class="songImgBox">
-        <img src="@/assets/img/无语狗.gif" alt="" />
+        <img :src="$store.getters.getSong.album" alt="" />
       </div>
       <div class="songDetailBox">
-        <div class="singName">解药</div>
-        <div class="singerName">高高高</div>
+        <div class="singName">{{ $store.getters.getSong.name }}</div>
+        <div class="singerName">{{ $store.getters.getSong.user }}</div>
       </div>
     </div>
   </div>
@@ -79,6 +79,7 @@ export default {
     height: 700px;
     background-color: #4b2e2b;
     position: relative;
+    border-bottom-right-radius: 20px;
     // 去除router-link的下划线
     .router-link-active {
       text-decoration: none;
@@ -135,6 +136,11 @@ export default {
         padding-left: 5px;
         box-sizing: border-box;
         font-weight: 900;
+        // 溢出隐藏并省略号
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
       }
       .singerName {
         width: 100%;
@@ -143,6 +149,11 @@ export default {
         padding-left: 5px;
         box-sizing: border-box;
         font-weight: 900;
+        // 溢出隐藏并省略号
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
       }
     }
   }
