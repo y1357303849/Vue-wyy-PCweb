@@ -1,5 +1,9 @@
 # czy-wyy
-
+# 运行服务端口
+```
+cd NeteaseCloudMusicApi
+node app
+```
 ## Project setup
 ```
 npm install
